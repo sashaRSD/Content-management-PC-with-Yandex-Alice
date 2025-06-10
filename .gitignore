@@ -1,0 +1,8 @@
+.idea
+dist
+venv
+Bot_AliceLaptop_build_exe.bat
+Bot_AliceLaptop_silent.vbs
+Bot_AliceLaptop_start_python.bat
+logfile.log
+

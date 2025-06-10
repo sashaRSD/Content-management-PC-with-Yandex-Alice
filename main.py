@@ -1,16 +1,17 @@
-from aiogram.utils import executor
-from pyfiglet import Figlet
+from aiogram.methods import DeleteWebhook
 from dir_bot import create_bot, client
+import asyncio
 
 
-async def on_startup(_):
-    preview_text = Figlet(font='slant')
-    print(preview_text.renderText("ALICE BOT"))
+async def on_startup():
+    print('Alice_bot is start!!!')
 
 
-def main():
-    executor.start_polling(create_bot.dp, skip_updates=True, on_startup=on_startup)
+async def main():
+    create_bot.dp.startup.register(on_startup)
+    await create_bot.bot(DeleteWebhook(drop_pending_updates=True))
+    await create_bot.dp.start_polling(create_bot.bot)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

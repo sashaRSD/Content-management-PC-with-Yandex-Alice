@@ -1,10 +1,22 @@
 from aiogram import Bot
-from aiogram.dispatcher import Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram import Dispatcher
 import configparser
-config = configparser.ConfigParser()
-config.read("dir_bot/config.ini")
-storage = MemoryStorage()
+import sys
+import os
 
-bot = Bot(token=config["TOKEN"]["token_bot_alice"])
-dp = Dispatcher(bot, storage=storage)
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = 'dir_bot'
+    return os.path.join(base_path, relative_path)
+
+
+config = configparser.ConfigParser()
+config.read(resource_path('config.ini'))
+token = config["DATA"]["token_bot_alice"]
+id_channel = config["DATA"]["id_channel"]
+
+bot = Bot(token=token)
+dp = Dispatcher()
