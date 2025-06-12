@@ -1,11 +1,11 @@
-from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import types, F
 from dir_bot import create_bot
-import speech_recognition, time, asyncio
+import speech_recognition
 import pyautogui as pg
 import ffmpeg, os
 import logging
+import asyncio
 
 
 logging.basicConfig(filename='logfile.log', level=logging.DEBUG,
@@ -28,14 +28,16 @@ async def voice(message: types.voice):
 
     ffmpeg.input(file_dir).output(new_file_dir).run()
     os.remove(file_dir)
+
     try:
         with speech_recognition.AudioFile(new_file_dir) as source:
             audio = sr.record(source=source)
             sr.adjust_for_ambient_noise(source=source, duration=0.5)
-            voice_text = sr.recognize_google(audio_data=audio, language='ru-RU').lower()
+            voice_text = await sr.recognize_google(audio_data=audio, language='ru-RU').lower()
     except speech_recognition.UnknownValueError:
         voice_text = "Хмм... Не понял что ты сказал :/"
-    time.sleep(1)
+
+    await asyncio.sleep(1)
     os.remove(new_file_dir)
 
     print(voice_text)
@@ -49,6 +51,7 @@ async def commands(message: types.Message):
     text = message.text
     await bot.delete_message(chat_id=id_channel, message_id=message.message_id)
     await work_of_functions(text)
+    await asyncio.sleep(4)
 
 
 @dp.callback_query()
@@ -84,10 +87,11 @@ async def work_of_functions(text):
     elif text == "информация" or text == "инструкция":
         print("Информация")
         post_button = InlineKeyboardBuilder()
-        post_button.add(InlineKeyboardButton(text="Пауза", callback_data="play_stop"))
-        post_button.add(InlineKeyboardButton(text="Продолжить", callback_data="continue"))
-        post_button.row(InlineKeyboardButton(text="Вперед", callback_data="forward"))
-        post_button.add(InlineKeyboardButton(text="Назад", callback_data="cancel"))
+        post_button.button(text="Пауза", callback_data="play_stop")
+        post_button.button(text="Продолжить", callback_data="continue")
+        post_button.button(text="Назад", callback_data="cancel")
+        post_button.button(text="Вперед", callback_data="forward")
+        post_button.adjust(2)
         await bot.send_message(id_channel, f"Play_Stop - Пауза - Стоп\n"
                                            f"Continue - Продолжить\n"
                                            f"Cancel - Назад\n"
@@ -97,6 +101,6 @@ async def work_of_functions(text):
     else:
         print("Error")
         smile = await bot.send_message(id_channel, '🗿')
-        await asyncio.sleep(5)
+        await asyncio.sleep(4)
         await bot.delete_message(chat_id=id_channel, message_id=smile.message_id)
         logging.info('Error')
